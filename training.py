@@ -51,8 +51,14 @@ for i in range(iterations):
     if i % 100 == 0:
         print(i, theta0, theta1)
 
+mse = (error ** 2).mean()
 
+rmse = mse ** 0.5
+
+print(f"MSE: {mse}")
+print(f"RMSE: {rmse}")
 print("\nTraining finished")
+
 print(theta0)
 print(theta1)
 
