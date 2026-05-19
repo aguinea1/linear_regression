@@ -1,9 +1,9 @@
-import pandas as pd
-import matplotlib.pyplot as plt
+import pandas as pd  # pandas para trabajar con tablas(data.csv)
+import matplotlib.pyplot as plt #visualizar datos (grafica)
 import json
 
 
-def estimate_price(mileage, theta0, theta1):
+def estimate_price(mileage, theta0, theta1): #formula de regresion lineal
     return theta0 + (theta1 * mileage)
 
 
@@ -15,55 +15,53 @@ except FileNotFoundError:
 
 
 km = data["km"]
-price = data["price"]
+price = data["price"] #guardar ddatos
 
-km_mean = km.mean()
+km_mean = km.mean() #media de datos
 km_std = km.std()
 
-km_normalized = (km - km_mean) / km_std
+km_normalized = (km - km_mean) / km_std #normalizacion (gradient descent va mal con numeros grandes)
 
 theta0 = 0
-theta1 = 0
+theta1 = 0 #el  agoritm empieza desde (0, 0) en el graph
 
-learning_rate = 0.01
-iterations = 1000
+learning_rate = 0.01 #cantidad de mod por iter
+iterations = 1000 
 
 
 for i in range(iterations):
 
-    estimated_price = estimate_price(
+    estimated_price = estimate_price(#predict de price
         km_normalized,
         theta0,
         theta1
     )
 
-    error = estimated_price - price
+    error = estimated_price - price #predit- reality
 
-    tmp_theta0 = learning_rate * error.mean()
+    tmp_theta0 = learning_rate * error.mean()  #corregir thetas
 
     tmp_theta1 = learning_rate * (
         error * km_normalized
     ).mean()
 
     theta0 = theta0 - tmp_theta0
-    theta1 = theta1 - tmp_theta1
+    theta1 = theta1 - tmp_theta1 #acecar mas thetas
 
     if i % 100 == 0:
         print(i, theta0, theta1)
 
-mse = (error ** 2).mean()
+mse = (error ** 2).mean() #mean squared error(cuanto se aleja)
 
-rmse = mse ** 0.5
 
 print(f"MSE: {mse}")
-print(f"RMSE: {rmse}")
 print("\nTraining finished")
 
 print(theta0)
 print(theta1)
 
 
-model_data = {
+model_data = { 
     "theta0": theta0,
     "theta1": theta1,
     "mean": km_mean,
@@ -71,13 +69,13 @@ model_data = {
 }
 
 
-with open("model.json", "w") as file:
+with open("model.json", "w") as file:#model.json
     json.dump(model_data, file)
 
 
-sorted_data = data.sort_values(by="km")
+sorted_data = data.sort_values(by="km")#all sorted by km
 
-sorted_km = sorted_data["km"]
+sorted_km = sorted_data["km"] #only kms sorted
 
 sorted_km_normalized = (
     sorted_km - km_mean
