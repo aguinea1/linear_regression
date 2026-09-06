@@ -57,15 +57,21 @@ mse = (error ** 2).mean() #mean squared error(cuanto se aleja)
 print(f"MSE: {mse}")
 print("\nTraining finished")
 
-print(theta0)
-print(theta1)
+# theta0/theta1 se calcularon sobre km normalizado (para que el gradient
+# descent converja bien), pero el subject pide la hipotesis
+# estimatePrice(mileage) = theta0 + theta1 * mileage sobre el mileage real.
+# Por eso los "desnormalizamos" aqui, para no tener que guardar/usar
+# mean y std en predict.py y respetar la formula tal cual.
+real_theta1 = theta1 / km_std
+real_theta0 = theta0 - (theta1 * km_mean / km_std)
+
+print(real_theta0)
+print(real_theta1)
 
 
-model_data = { 
-    "theta0": theta0,
-    "theta1": theta1,
-    "mean": km_mean,
-    "std": km_std
+model_data = {
+    "theta0": real_theta0,
+    "theta1": real_theta1
 }
 
 
@@ -77,15 +83,10 @@ sorted_data = data.sort_values(by="km")#all sorted by km
 
 sorted_km = sorted_data["km"] #only kms sorted
 
-sorted_km_normalized = (
-    sorted_km - km_mean
-) / km_std
-
-
 predicted_prices = estimate_price(
-    sorted_km_normalized,
-    theta0,
-    theta1
+    sorted_km,
+    real_theta0,
+    real_theta1
 )
 
 

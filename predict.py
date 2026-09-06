@@ -2,24 +2,23 @@ import json
 import os
 
 
-def estimate_price(mileage, theta0, theta1):
+def estimate_price(mileage, theta0, theta1):  # hipotesis exacta del subject
     return theta0 + (theta1 * mileage)
 
 
-if not os.path.exists("model.json"):
-    print("Error: model.json not found")
-    exit()
+# Antes de entrenar, theta0 y theta1 deben valer 0 (asi lo pide el subject),
+# asi que el programa no debe petar si aun no existe model.json
+theta0 = 0
+theta1 = 0
 
+if os.path.exists("model.json"):
+    with open("model.json", "r") as file:
+        model_data = json.load(file)
 
-with open("model.json", "r") as file:
-    model_data = json.load(file)
-
-
-theta0 = model_data["theta0"]
-theta1 = model_data["theta1"]
-
-km_mean = model_data["mean"]
-km_std = model_data["std"]
+    theta0 = model_data["theta0"]
+    theta1 = model_data["theta1"]
+else:
+    print("No model trained yet, using theta0 = 0 and theta1 = 0")
 
 
 try:
@@ -34,13 +33,10 @@ except ValueError:
     exit()
 
 
-mileage_normalized = (
-    mileage - km_mean
-) / km_std
-
-
+# theta0/theta1 ya estan desnormalizados (ver training.py), asi que aqui
+# se aplica la formula tal cual sobre el mileage real, sin normalizar nada
 prediction = estimate_price(
-    mileage_normalized,
+    mileage,
     theta0,
     theta1
 )
